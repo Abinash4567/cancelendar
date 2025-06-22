@@ -8,7 +8,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogClose,
 } from "@/components/ui/dialog";
 import EventForm from "@/components/EventForm";
 
@@ -16,7 +15,7 @@ export default function Sidebar() {
   const today: Date = new Date();
 
   return (
-    <aside className="w-64 border-r flex flex-col">
+    <aside className="border-r flex flex-col w-fit">
       <div className="p-4 text-xl font-bold">Cancelendar</div>
       <div className="flex flex-col gap-4 p-4">
         <Dialog>
