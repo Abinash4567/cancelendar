@@ -1,7 +1,12 @@
+'use client'
+
 import React from 'react';
+import Link from "next/link";
 import { Calendar, Clock, Users, CheckCircle } from 'lucide-react';
+import { useSession } from "next-auth/react"
 
 const Home = () => {
+  const { data: session } = useSession()
 
   const features = [
     {
@@ -35,16 +40,12 @@ const Home = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <button
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                Sign In
-              </button>
-              <button
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                Get Started
-              </button>
+              {session ? (<div className='border border-gray-700 hover:border-gray-600 text-white px-3 py-2 h-10 w-10 font-semibold rounded-full transition-all hover:bg-gray-900 cursor-pointer'>{session.user?.name?.split("")[0]}</div>) : (<Link href='api/auth/signin'>
+                <button
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors cursor-pointer"
+                >
+                  Get Started
+                </button></Link>)}
             </div>
           </div>
         </div>
