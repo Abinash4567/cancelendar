@@ -6,7 +6,7 @@ import { Calendar, Clock, Users, CheckCircle } from 'lucide-react';
 import { useSession } from "next-auth/react"
 
 const Home = () => {
-  const { data: session } = useSession()
+  const { data: session } = useSession();
 
   const features = [
     {
