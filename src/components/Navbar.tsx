@@ -1,6 +1,6 @@
 'use client';
 
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuRadioItem, DropdownMenuRadioGroup } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuRadioItem, DropdownMenuRadioGroup } from "@/components/ui/dropdown-menu";
 import { ModeToggle } from "./ModeToggle";
 import { useSession } from "next-auth/react";
 import { ChevronRight, ChevronLeft, Search } from 'lucide-react';
@@ -12,7 +12,7 @@ export default function Navbar() {
   const [position, setPosition] = useState("bottom")
   const { data: session } = useSession();
   return (
-    <header className="flex items-center justify-between h-16 px-6 border-b">
+    <header className="flex items-center justify-between h-12 px-6 border-b">
       <div className="flex gap-4">
         <div className="flex gap-2">
           <ChevronLeft />
