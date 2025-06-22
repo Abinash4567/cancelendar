@@ -10,7 +10,6 @@ export const metadata = {
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex h-screen">
-      {/* fixed-width sidebar */}
       <Sidebar />
 
       {/* main content area */}

@@ -1,21 +1,38 @@
-import Link from "next/link";
-import { Home, Settings, Users } from "lucide-react";
+"use client";
+
+import { Calendar } from "@/components/ui/calendar";
+import { Button } from "./ui/button";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+} from "@/components/ui/dialog";
+import EventForm from "@/components/EventForm";
 
 export default function Sidebar() {
+  const today: Date = new Date();
+
   return (
     <aside className="w-64 border-r flex flex-col">
       <div className="p-4 text-xl font-bold">Cancelendar</div>
-      <nav className="flex-1 px-2 space-y-1">
-        <Link href="/dashboard" className="flex items-center gap-2 p-2 rounded hover:bg-gray-100">
-          <Home size={18} /> Dashboard
-        </Link>
-        <Link href="/dashboard/users" className="flex items-center gap-2 p-2 rounded hover:bg-gray-100">
-          <Users size={18} /> Users
-        </Link>
-        <Link href="/dashboard/settings" className="flex items-center gap-2 p-2 rounded hover:bg-gray-100">
-          <Settings size={18} /> Settings
-        </Link>
-      </nav>
+      <div className="flex flex-col gap-4 p-4">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline">Create an Event</Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-xl">
+            <DialogHeader>
+              <DialogTitle>Create Event</DialogTitle>
+            </DialogHeader>
+            <EventForm />
+          </DialogContent>
+        </Dialog>
+
+        <Calendar today={today} mode="single" />
+      </div>
     </aside>
   );
 }
