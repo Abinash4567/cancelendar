@@ -1,5 +1,7 @@
-"use client";
+'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "./ui/button";
 import {
@@ -10,11 +12,23 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import EventForm from "@/components/EventForm";
-import { useState } from "react";
+
+type CalendarValue = Date | undefined;
 
 export default function Sidebar() {
-  const today: Date = new Date();
-  const [open, setOpen] = useState(false)
+  const today = new Date();
+  const router = useRouter();
+
+  // track selected date if you want to highlight it in the UI
+  const [selectedDate, setSelectedDate] = useState<CalendarValue>(today);
+  const [open, setOpen] = useState(false);
+
+  const handleDateSelect = (date: CalendarValue) => {
+    if (!date) return;
+    setSelectedDate(date);
+    const iso = date.toISOString().slice(0, 10);
+    router.replace(`?view=day&date=${iso}`);
+  };
 
   return (
     <aside className="border-r flex flex-col w-fit">
@@ -28,11 +42,16 @@ export default function Sidebar() {
             <DialogHeader>
               <DialogTitle>Create Event</DialogTitle>
             </DialogHeader>
-            <EventForm onSuccess={() => setOpen(false)}/>
+            <EventForm onSuccess={() => setOpen(false)} />
           </DialogContent>
         </Dialog>
 
-        <Calendar today={today} mode="single" />
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={handleDateSelect}
+          today={today}
+        />
       </div>
     </aside>
   );
