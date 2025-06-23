@@ -113,9 +113,10 @@ const CalendarMonth: React.FC<CalendarMonthProps> = ({ year = 2025, month = 6 })
             >
               {format(dayDate, 'd')}
               <div className='flex flex-col gap-1'>
-                <div className='text-xs bg-green-900 rounded-xl cursor-pointer mx-2 text-black font-semibold'>Event1</div>
-                <div className='text-xs bg-green-900 rounded-xl cursor-pointer mx-2 text-black font-semibold'>Event1</div>
-                <div className='text-xs bg-green-900 rounded-xl cursor-pointer mx-2 text-black font-semibold'>Event1</div>
+                <div className='text-xs rounded-xl cursor-pointer mx-2 text-white hover:bg-slate-900'>12:30pm <span className='font-semibold'>syncup</span></div>
+                <div className='text-xs rounded-xl cursor-pointer mx-2 text-white hover:bg-slate-900'>12:30pm <span className='font-semibold'>syncup</span></div>
+                <div className='text-xs rounded-xl cursor-pointer mx-2 text-white hover:bg-slate-900'>12:30pm <span className='font-semibold'>syncup</span></div>
+                <div className='text-xs rounded-xl cursor-pointer mx-2 text-white hover:bg-slate-900'>12:30pm <span className='font-semibold'>syncup</span></div>
               </div>
             </div>
           );

@@ -1,10 +1,12 @@
-// components/EventForm.tsx
 "use client"
 
 import { z } from "zod"
 import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
+import { useTransition } from "react"
+import { toast } from "sonner"
+import { useSession } from "next-auth/react"
 
 import {
   Form,
@@ -25,10 +27,17 @@ import {
 } from "@/components/ui/popover"
 import { CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { createEvent } from "@/lib/actions/event.actions";
 
-const recurrenceOptions = ["None", "Daily", "Weekly", "Monthly", "Custom"] as const
-const priorityOptions = ["P0", "P1", "P2"] as const
+const recurrenceOptions = ["NONE", "DAILY", "WEEKLY", "MONTHLY", "CUSTOM"] as const;
+const priorityOptions = ["P0", "P1", "P2"] as const;
 
 const FormSchema = z
   .object({
@@ -37,22 +46,34 @@ const FormSchema = z
     startTime: z.string().min(1, "Start time is required"),
     endTime: z.string().min(1, "End time is required"),
     description: z.string().optional(),
-    recurrence: z.enum(recurrenceOptions),
     customRecurrence: z.string().optional(),
+    recurrence: z.enum(recurrenceOptions),
     priority: z.enum(priorityOptions),
   })
   .refine(
-    (data) => data.recurrence !== "Custom" || (data.customRecurrence && data.customRecurrence.trim() !== ""),
+    (data) =>
+      data.recurrence !== "CUSTOM" ||
+      (data.customRecurrence && data.customRecurrence.trim() !== ""),
     {
       path: ["customRecurrence"],
       message: "Custom recurrence pattern is required when 'Custom' is selected",
     }
   )
-
+  .refine(
+    (data) => {
+      if (!data.startTime || !data.endTime) return true
+      return data.startTime < data.endTime
+    },
+    {
+      path: ["endTime"],
+      message: "End time must be after start time",
+    }
+  )
 
 type EventFormValues = z.infer<typeof FormSchema>
 
-export default function EventForm() {
+export default function EventForm({ onSuccess }: { onSuccess?: () => void }) {
+  const { data: session } = useSession();
   const form = useForm<EventFormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -61,16 +82,43 @@ export default function EventForm() {
       startTime: "",
       endTime: "",
       description: "",
-      recurrence: "None",
+      recurrence: "NONE",
       customRecurrence: "",
-      priority: "P1",
+      priority: 'P1',
     },
   })
 
+  const [isPending, startTransition] = useTransition()
   const recurrenceValue = useWatch({ control: form.control, name: "recurrence" })
 
   const onSubmit = (data: EventFormValues) => {
-    console.log("Form Data:", data)
+    startTransition(async () => {
+      try {
+        if (!session?.user?.email) {
+          throw new Error("User email not available in session")
+        }
+        await createEvent(
+          {
+            title: data.title,
+            description: data.description,
+            date: data.date.toISOString().split("T")[0],
+            startTime: data.startTime,
+            endTime: data.endTime,
+            recurrence: data.recurrence,
+            customRecurrence: data.customRecurrence,
+            priority: data.priority,
+          },
+          session.user.email
+        )
+
+        toast.success("Event created successfully")
+        form.reset()
+        onSuccess?.()
+      } catch (error) {
+        toast.error("Failed to create event")
+        console.error(error)
+      }
+    })
   }
 
   return (
@@ -156,8 +204,8 @@ export default function EventForm() {
           />
         </div>
 
+        {/* Recurrence and Priority */}
         <div className="flex gap-4 w-full">
-          {/* Recurrence */}
           <div className="flex-1">
             <FormField
               control={form.control}
@@ -185,7 +233,6 @@ export default function EventForm() {
             />
           </div>
 
-          {/* Priority */}
           <div className="flex-1">
             <FormField
               control={form.control}
@@ -214,10 +261,7 @@ export default function EventForm() {
           </div>
         </div>
 
-
-
-        {/* Custom Recurrence Field (only if "Custom" is selected) */}
-        {recurrenceValue === "Custom" && (
+        {recurrenceValue === "CUSTOM" && (
           <FormField
             control={form.control}
             name="customRecurrence"
@@ -233,7 +277,6 @@ export default function EventForm() {
           />
         )}
 
-        {/* Description */}
         <FormField
           control={form.control}
           name="description"
@@ -248,8 +291,8 @@ export default function EventForm() {
           )}
         />
 
-        <Button type="submit" className="w-full">
-          Create Event
+        <Button type="submit" className="w-full" disabled={isPending}>
+          {isPending ? "Creating..." : "Create Event"}
         </Button>
       </form>
     </Form>

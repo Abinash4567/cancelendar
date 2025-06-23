@@ -4,6 +4,7 @@ import React from 'react';
 import Link from "next/link";
 import { Calendar, Clock, Users, CheckCircle } from 'lucide-react';
 import { useSession } from "next-auth/react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 const Home = () => {
   const { data: session } = useSession();
@@ -40,12 +41,28 @@ const Home = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              {session ? (<div className='border border-gray-700 hover:border-gray-600 text-white px-3 py-2 h-10 w-10 font-semibold rounded-full transition-all hover:bg-gray-900 cursor-pointer'>{session.user?.name?.split("")[0]}</div>) : (<Link href='api/auth/signin'>
-                <button
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors cursor-pointer"
-                >
-                  Get Started
-                </button></Link>)}
+              {session ? (
+                <Avatar>
+                  <AvatarImage
+                    src={session.user?.image || undefined}
+                    alt={session.user?.name || "User avatar"}
+                  />
+                  <AvatarFallback>
+                    {session.user?.name
+                      ? session.user.name.charAt(0).toUpperCase()
+                      : ""}
+                  </AvatarFallback>
+                </Avatar>
+              ) : (
+                <Link href="/api/auth/signin">
+                  <button
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Get Started
+                  </button>
+                </Link>
+              )}
+
             </div>
           </div>
         </div>

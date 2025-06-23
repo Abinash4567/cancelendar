@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+
+}
+
+enum Recurrence {
+  NONE
+  DAILY
+  WEEKLY
+  MONTHLY
+  CUSTOM
+}
+
+enum Priority {
+  P0
+  P1
+  P2
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  email     String   @unique
+  image     String
+  events    Event[]
+
+}
+
+model Event {
+  id               String     @id @default(uuid()) @db.Uuid
+  title            String     @db.VarChar(255)
+  description      String?    @db.Text
+  start            DateTime
+  end              DateTime
+  recurrence       Recurrence @default(NONE)
+  customRecurrence String?
+  priority         Priority   @default(P1)
+
+  userId           String     @db.Uuid
+  user             User       @relation(fields: [userId], references: [id])
+
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  @@index([title], map: "idx_event_title")
+  @@index([start, end], map: "idx_event_date_range")
+  @@index([userId], map: "idx_event_user")
+}
