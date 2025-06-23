@@ -72,7 +72,7 @@ export default function CalendarMonth() {
         id:    ev.id,
         title: ev.title,
         start: ev.start.toISOString(),
-        end:   ev.end.toISOString(),
+        end:   ev.end?.toISOString(),
       }));
       setEvents(mapped);
     }
