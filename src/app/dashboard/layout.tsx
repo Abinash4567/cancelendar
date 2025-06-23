@@ -1,11 +1,8 @@
+'use client';
 
-import { ReactNode } from "react";
-import Sidebar from "@/components/Sidebar";
-import Navbar from "@/components/Navbar";
-export const metadata = {
-  title: "Cancelendar",
-  description: "Dashboard",
-};
+import { ReactNode, Suspense } from 'react';
+import Sidebar from '@/components/Sidebar';
+import Navbar from '@/components/Navbar';
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
@@ -19,7 +16,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
         {/* page content */}
         <main className="flex-1 overflow-auto">
-          {children}
+          {/* Suspense boundary catches your useSearchParams() in CalendarMonth */}
+          <Suspense fallback={<div className="p-4 text-center">Loading dashboard…</div>}>
+            {children}
+          </Suspense>
         </main>
       </div>
     </div>
