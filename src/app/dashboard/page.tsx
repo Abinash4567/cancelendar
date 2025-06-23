@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import {
@@ -38,7 +38,7 @@ const parseMinutes = (hhmm: string) => {
   return h * 60 + m;
 };
 
-export default function CalendarMonth() {
+function CalendarMonth() {
   const { data: session } = useSession();
   const params = useSearchParams();
   const viewParam = params.get('view');
@@ -166,5 +166,13 @@ export default function CalendarMonth() {
         })}
       </div>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div className="p-4 text-center">Loading calendar…</div>}>
+      <CalendarMonth />
+    </Suspense>
   );
 }
