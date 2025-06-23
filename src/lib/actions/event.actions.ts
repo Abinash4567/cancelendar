@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from "@/lib/prisma";
-import { parseISO, startOfMonth, addMonths, startOfDay, endOfDay } from 'date-fns';
+import { parseISO, startOfMonth, addMonths, subMonths } from 'date-fns';
 import { Recurrence, Priority, } from "@/generated/prisma";
 import { Prisma } from "@/generated/prisma";
 
@@ -109,17 +109,36 @@ export async function deleteEvent(eventId: string) {
   }
 }
 
-// 5. Get events in a particular day (e.g., '2025-09-09')
-export async function getEventsInDay(day: string, userId: string) {
-  const dayStart = startOfDay(parseISO(day));
-  const dayEnd = endOfDay(parseISO(day));
-  return db.event.findMany({
+export async function getEventsInDay(
+  startIso: string,
+  endIso: string,
+  email: string
+) {
+  const startDate = parseISO(startIso);
+  const endDate = parseISO(endIso);
+
+  // …then shift each by +1 month
+  const shiftedStart = addMonths(startDate, 1);
+  const shiftedEnd = addMonths(endDate, 1);
+
+  const events = await db.event.findMany({
     where: {
-      userId,
-      start: { gte: dayStart, lte: dayEnd }
+      start: {
+        gte: shiftedStart,
+        lte: shiftedEnd
+      },
+      user: { email }
     },
     orderBy: { start: 'asc' }
   });
+
+
+  return events.map(event => ({
+    ...event,
+    start: subMonths(event.start, 1),
+    // only do end if your model has it
+    end: event.end ? subMonths(event.end, 1) : undefined
+  }));
 }
 
 export async function searchEvents(query: string, email: string) {
@@ -139,7 +158,6 @@ export async function searchEvents(query: string, email: string) {
     orderBy: { start: 'asc' },
   });
 }
-
 
 export async function changeEventDate(
   eventId: string,
