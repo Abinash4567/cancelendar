@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useMemo, Suspense } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import {
@@ -18,6 +18,7 @@ import {
   isSameMonth,
 } from 'date-fns';
 import { getEventsInDay } from '@/lib/actions/event.actions';
+import dynamic from 'next/dynamic';
 
 export interface DayEvent {
   id: string;
@@ -38,7 +39,6 @@ const parseMinutes = (hhmm: string) => {
   return h * 60 + m;
 };
 
-// Move the component that uses useSearchParams into its own component
 function CalendarMonth() {
   const { data: session } = useSession();
   const params = useSearchParams();
@@ -170,11 +170,12 @@ function CalendarMonth() {
   );
 }
 
-// Wrap the component that uses useSearchParams in Suspense
+// Use dynamic import to disable SSR for this component
+const DynamicCalendarMonth = dynamic(() => Promise.resolve(CalendarMonth), {
+  ssr: false,
+  loading: () => <div className="p-4 text-center">Loading calendar…</div>
+});
+
 export default function DashboardPage() {
-  return (
-    <Suspense fallback={<div className="p-4 text-center">Loading calendar…</div>}>
-      <CalendarMonth />
-    </Suspense>
-  );
+  return <DynamicCalendarMonth />;
 }
