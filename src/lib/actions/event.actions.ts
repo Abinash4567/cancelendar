@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/prisma";
 import { parseISO, startOfMonth, addMonths, startOfDay, endOfDay } from 'date-fns';
-import { Recurrence, Priority,  } from "@/generated/prisma";
+import { Recurrence, Priority, } from "@/generated/prisma";
 import { Prisma } from "@/generated/prisma";
 
 export async function getEventsInMonth(month: string, userId: string) {
@@ -122,30 +122,25 @@ export async function getEventsInDay(day: string, userId: string) {
   });
 }
 
-const lastSearchTime = new Map<string, number>();
-const THROTTLE_MS = 1000;
-
-export async function searchEventsThrottled(query: string, userId: string) {
-  const now = Date.now();
-  const last = lastSearchTime.get(userId) || 0;
-  if (now - last < THROTTLE_MS) {
-    throw new Error('Too many requests. Please wait a moment.');
-  }
-  lastSearchTime.set(userId, now);
+export async function searchEvents(query: string, email: string) {
+  if (!email)
+    return []
 
   return db.event.findMany({
     where: {
-      userId,
+      user: {
+        email: email,
+      },
       OR: [
         { title: { contains: query, mode: 'insensitive' } },
-        { description: { contains: query, mode: 'insensitive' } }
-      ]
+        { description: { contains: query, mode: 'insensitive' } },
+      ],
     },
-    orderBy: { start: 'asc' }
+    orderBy: { start: 'asc' },
   });
 }
 
-// 7. Change date of event, ensure no collision
+
 export async function changeEventDate(
   eventId: string,
   newDate: string
