@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   experimental: {
-    // turn off the missing-Suspense-with-CSR-bailout build-time error
+    // @ts-expect-error this flag isn’t yet in the NextConfig types
     missingSuspenseWithCSRBailout: false,
   },
 };
