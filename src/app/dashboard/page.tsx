@@ -38,6 +38,7 @@ const parseMinutes = (hhmm: string) => {
   return h * 60 + m;
 };
 
+// Move the component that uses useSearchParams into its own component
 function CalendarMonth() {
   const { data: session } = useSession();
   const params = useSearchParams();
@@ -169,6 +170,7 @@ function CalendarMonth() {
   );
 }
 
+// Wrap the component that uses useSearchParams in Suspense
 export default function DashboardPage() {
   return (
     <Suspense fallback={<div className="p-4 text-center">Loading calendar…</div>}>
