@@ -1,4 +1,4 @@
-declare module "next-auth" {
+export declare module "next-auth" {
   interface Session {
     user: {
       name: string
@@ -7,3 +7,4 @@ declare module "next-auth" {
     }
   }
 }
+
